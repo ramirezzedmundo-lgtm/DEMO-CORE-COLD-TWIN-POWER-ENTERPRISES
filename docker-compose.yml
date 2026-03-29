@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  cold-gateway: # El receptor en Go
+    build: ./services/gateway
+    ports: ["8080:8080"]
+  twin-brain: # La IA Siamesa en Python
+    build: ./services/ia-engine
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia # Para el músculo de la GPU
+              count: 1
+              capabilities: [gpu]
+  power-audit: # El validador en Rust
+    build: ./services/auditor
+    depends_on: [db-core]
+  db-core: # El corazón de datos
+    image: postgres:16-alpine
