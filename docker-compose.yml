@@ -41,3 +41,13 @@ networks:
 
 volumes:
   redis_data:
+# El Vigilante: Auditoría Criptográfica en Rust
+  auditor-rust:
+    build:
+      context: .
+      dockerfile: Dockerfile.rust
+    depends_on:
+      - redis
+    networks:
+      - twin-power-net
+    restart: always
