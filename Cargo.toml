@@ -1,0 +1,10 @@
+[package]
+name = "power-auditor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Librería para el SHA-256 de grado militar
+sha2 = "0.10"
+# Para que Rust pueda hablar con el Core en el futuro
+redis = "0.24.0"
