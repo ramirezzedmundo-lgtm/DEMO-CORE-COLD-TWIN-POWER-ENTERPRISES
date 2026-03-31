@@ -1,64 +1,43 @@
 version: '3.8'
 
 services:
-  # --- CAPA DE INGESTIÓN (EL FILTRO) ---
-  cold-gateway:
-    container_name: cold-gateway-go
-    build: 
-      context: ./services/ingestion-go
+  # El Corazón: Cold-Gateway en Go
+  gateway:
+    build: .
     ports:
       - "8080:8080"
-    environment:
-      - NODE_ENV=production
-      - JWT_SECRET=core_cold_twin_secret_2026
-    networks:
-      - retail-hurricane-net
-    restart: always
-
-  # --- CAPA DE INTELIGENCIA (EL CEREBRO) ---
-  twin-brain:
-    container_name: twin-brain-python
-    build: 
-      context: ./services/inference-py
-    volumes:
-      - ./models:/app/models # Para cargar tus Redes Siamesas
     depends_on:
-      - redis-cache
-    networks:
-      - retail-hurricane-net
-    restart: always
-
-  # --- CAPA DE INTEGRIDAD (EL AUDITOR) ---
-  power-audit:
-    container_name: power-audit-rust
-    build: 
-      context: ./services/audit-rust
-    depends_on:
-      - db-core
-    networks:
-      - retail-hurricane-net
-    restart: always
-
-  # --- INFRAESTRUCTURA DE DATOS (EL CORAZÓN) ---
-  db-core:
-    image: postgres:16-alpine
-    container_name: core-db-sql
+      - redis
     environment:
-      POSTGRES_DB: retail_audit
-      POSTGRES_USER: edmundo_admin
-      POSTGRES_PASSWORD: power_password_2026
-    ports:
-      - "5432:5432"
+      - REDIS_ADDR=redis:6379
     networks:
-      - retail-hurricane-net
+      - twin-power-net
+    restart: always
 
-  redis-cache:
+  # El Motor: Redis para el ROI y Tokens
+  redis:
     image: redis:7-alpine
-    container_name: core-cache-speed
+    ports:
+      - "6379:6379"
     networks:
-      - retail-hurricane-net
+      - twin-power-net
+    volumes:
+      - redis_data:/data
 
-# RED INTERNA SEGURA (ZERO-TRUST CONCEPT)
+  # La Metralleta: Simulador de IA en Python
+  simulator:
+    build: 
+      context: .
+      dockerfile: Dockerfile.simulator
+    depends_on:
+      - gateway
+    networks:
+      - twin-power-net
+    restart: unless-stopped
+
 networks:
-  retail-hurricane-net:
+  twin-power-net:
     driver: bridge
+
+volumes:
+  redis_data:
