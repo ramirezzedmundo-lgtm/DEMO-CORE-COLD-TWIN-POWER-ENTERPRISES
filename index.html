@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TWIN-POWER ROI</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff00; font-family: monospace; text-align: center; padding-top: 100px; }
+        #counter { font-size: 120px; text-shadow: 0 0 20px #00ff00; }
+        .label { font-size: 24px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="label">CAPITAL RECUPERADO EN TIEMPO REAL (MXN)</div>
+    <div id="counter">$0.00</div>
+    <script>
+        setInterval(async () => {
+            const res = await fetch('http://localhost:8080/v1/recovery/total');
+            const data = await res.text();
+            document.getElementById('counter').innerText = '$' + data;
+        }, 1000);
+    </script>
+</body>
+</html>
